@@ -122,13 +122,13 @@ class Cube(Members):
 
 	def change_to(cube, view):
 		maps = {
-			left: cube.change_to_left,
-			right: cube.change_to_right,
-			top: cube.change_to_top,
-			bottom: cube.change_to_bottom,
-			back: cube.change_to_back,
+			left: cube.change_to_left(),
+			right: cube.change_to_right(),
+			top: cube.change_to_top(),
+			bottom: cube.change_to_bottom(),
+			back: cube.change_to_back(),
 		}
-		return maps[view]()
+		return maps[view]
 
 	# Rotation of a Square --------------------------------
 
