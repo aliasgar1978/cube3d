@@ -1,6 +1,6 @@
 
 import pandas as pd
-from base import *
+from .base import *
 
 def read_cube_from_excel(file):
 	d = {}

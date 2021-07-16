@@ -32,15 +32,15 @@ class Members():
 class Point():
 
 	def __init__(self, **kwargs):
-		self.members = {'x':{'position': None , 'xiscolor': None}, 
-			'y':{'position': None , 'xiscolor': None}, 
-			'z':{'position': None , 'xiscolor': None} }
+		self.members = {'x':{'direction': None , 'xiscolor': None}, 
+			'y':{'direction': None , 'xiscolor': None}, 
+			'z':{'direction': None , 'xiscolor': None} }
 		self.set(**kwargs)
 	
 	def set(self, **kwargs):
 		for k, v in kwargs.items():
 			if k in XISCOLOR: self.members[k[0]]['xiscolor'] = v
-			if k in AXISES: self.members[k[0]]['position'] = v
+			if k in AXISES: self.members[k[0]]['direction'] = v
 
 class Band(Members): pass
 class Square(Members): pass
@@ -120,6 +120,16 @@ class Cube(Members):
 		_cube = cube.change_to_top()
 		return _cube.change_to_top()
 
+	def change_to(cube, view):
+		maps = {
+			left: cube.change_to_left,
+			right: cube.change_to_right,
+			top: cube.change_to_top,
+			bottom: cube.change_to_bottom,
+			back: cube.change_to_back,
+		}
+		return maps[view]()
+
 	# Rotation of a Square --------------------------------
 
 	def rotate_square(cube, view, clockwise=True):
@@ -162,7 +172,7 @@ def rotate_cube(squares, *args, **kwargs):
 def change_position(instance, swap_axis, inverse_axis):
 	a, b = swap_axis[0], swap_axis[1]
 	for point in instance.members.flat:
-		point.members[inverse_axis]['position'] *= -1
+		point.members[inverse_axis]['direction'] *= -1
 		point.members[a], point.members[b] = point.members[b], point.members[a]
 	return instance
 
