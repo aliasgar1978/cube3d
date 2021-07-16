@@ -21,14 +21,14 @@ CB = get_cube("cube.xlsx")
 #             ( True=Clockwise direction, False=Anticlockwise direction ), 
 #             default=clockwise (i.e: True)
 # ----------------------------------------------------------------------------- #
-# CB.rotate_square(view=front, clockwise=False)
+CB.rotate_square(view=front, clockwise=False)
 
 
 # ----------------------------------------------------------------------------- #
 # Change the Cube view to another direction
 # view = defines the face to which we want to face.
 # ----------------------------------------------------------------------------- #
-# CB = CB.change_to(view=left)
+CB = CB.change_to(view=left)
 
 
 # ----------------------------------------------------------------------------- #
@@ -36,17 +36,17 @@ CB = get_cube("cube.xlsx")
 # ----------------------------------------------------------------------------- #
 
 # ### print if the cube is solved or not ###
-# print(CB.is_solved())
+print(CB.is_solved())
 
 # ### print a view/face side ###
-# pprint(CB.show(front))
+pprint(CB.show(front))
 
 # ### print side of the face for a particular direction ###
-# face = back
-# direction = "y"
+face = back
+direction = "y"
 
-# for band in CB.views[face]:
-# 	for piece in band:
-# 		print(piece.members[direction])
+for band in CB.views[face]:
+	for piece in band:
+		print(piece.members[direction])
 
 # ----------------------------------------------------------------------------- #
