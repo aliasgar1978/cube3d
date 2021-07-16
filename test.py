@@ -10,9 +10,24 @@ from cube3d import *
 front, back, top, bottom, left, right = ('front', 'back', 'top', 'bottom', 'left', 'right')
 
 # ----------------------------------------------------------------------------- #
-# Create a Cube
+# Create a Cube using Excel file input
 # ----------------------------------------------------------------------------- #
 CB = get_cube("cube.xlsx")
+
+# ----------------------------------------------------------------------------- #
+# Otherway to create a cube statically, 
+# instead of providing Excel file as input
+# ----------------------------------------------------------------------------- #
+# 1. Create 27 x "Point" objects
+#    ex: P1 = Point(x=-1 ,y=-1  ,z=-1 , x_color='yellow', y_color='blue', z_color='red')
+# 2. Create  9 x "Band"  objects using set of three-three Point objects
+#    ex: B1 = Band(P1, P2, P3)
+# 3. Create  3 x "Square" objects using set of three-three Band objects
+#    ex: SQ1 = Square(B1, B2, B3)
+# 4. Create  cube using three Square objects created above.
+#    ex: CB = Cube(SQ1, SQ2, SQ3)
+# ----------------------------------------------------------------------------- #
+
 
 # ----------------------------------------------------------------------------- #
 # Rotate the square face/view to a direction
