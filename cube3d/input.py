@@ -1,8 +1,13 @@
+# --------------------------------------------------------------------------------------------
 
 import pandas as pd
 from .base import *
+# --------------------------------------------------------------------------------------------
 
 def read_cube_from_excel(file):
+	"""reads the cube data from input excel file, and returns data in the form of dictionary 
+	--> dict
+	"""
 	d = {}
 	for side, ax in axis_map.items():
 		transpose_for = (front, bottom, top, back)
@@ -14,6 +19,10 @@ def read_cube_from_excel(file):
 	return d
 
 def get_cube(file):
+	"""reads the data from excel file, creates necessary Points>Bands>Squares>Cube objects and returns 
+	cube object to work upon.
+	--> base.Cube
+	"""
 	d = read_cube_from_excel(file)
 	P000 = Point(x=-1 ,y=-1  ,z=-1 , x_color=d[left][2][2], y_color=d[bottom][0][0], z_color=d[front][2][0])
 	P001 = Point(x=0  ,y=-1  ,z=-1 , x_color=None, y_color=d[bottom][0][1], z_color=d[front][2][1])
@@ -62,3 +71,4 @@ def get_cube(file):
 	return Cube(SQZ0, SQZ1, SQZ2)
 
 
+# --------------------------------------------------------------------------------------------
