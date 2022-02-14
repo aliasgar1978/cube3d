@@ -1,12 +1,15 @@
-
+"""Model defining 0D, 1D, 2D, 3D elements requirements for cube and its rotation methods.
+"""
 import numpy as np
 
-# --------------------------------------------------------------------------------------------
+# ---------------
+
 AXISES = ('x', 'y', 'z')
-XISCOLOR = ('x_color', 'y_color', 'z_color')												# color of a cube
-front, back, top, bottom, left, right = ('front', 'back', 'top', 'bottom', 'left', 'right')	# different views/directions
-view_dir = {front:'z', back:'z', top:'y', bottom:'y', left:'x', right:'x'}					# axis/direction to which view belongs to
-axis_map = {																				# -1, 1 : direction of axis
+XISCOLOR = ('x_color', 'y_color', 'z_color')
+# views
+front, back, top, bottom, left, right = ('front', 'back', 'top', 'bottom', 'left', 'right')
+view_dir = {front:'z', back:'z', top:'y', bottom:'y', left:'x', right:'x'}
+axis_map = {
 	front: {'z': -1},
 	back: {'z': 1},
 	top: {'y': 1},
@@ -14,10 +17,18 @@ axis_map = {																				# -1, 1 : direction of axis
 	left: {'x': -1},
 	right: {'x': 1},
 }
-# --------------------------------------------------------------------------------------------
+# ---------------
 
 class Members():
-	"""Papa class"""
+	"""Common Methods and properties defining multiple member types
+	Initialize different kinds of objects by providing respective arguments.
+
+	Common properties/methods available are:
+		* len()
+		* getitem
+		* reversed()
+		* iterate over
+	"""	
 	def __init__(self, *arg): self.members = np.array(arg)
 	def __len__(self): return len(self.members)
 	def __getitem__(self, i): return self.members[i]
@@ -30,35 +41,46 @@ class Members():
 
 
 class Point():
-	"""Point class defining a single Pag and its properties/methods on Rubix cube"""
+	"""A Zero-Dimentional; Single Point Object and its properties.
+	"""    	
 
 	def __init__(self, **kwargs):
+		"""Initialize Point Object by providing its co-ordinates and colors.
+		"""    		
 		self.members = {'x':{'direction': None , 'xiscolor': None}, 
 			'y':{'direction': None , 'xiscolor': None}, 
 			'z':{'direction': None , 'xiscolor': None} }
 		self.set(**kwargs)
 	
 	def set(self, **kwargs):
-		"""set the properties of Point instance
-		valid arguments should be from XISCOLOR and AXISES variable
-		"""
+		"""set the Point objects co-ordinates and colors.
+		"""    		
 		for k, v in kwargs.items():
 			if k in XISCOLOR: self.members[k[0]]['xiscolor'] = v
 			if k in AXISES: self.members[k[0]]['direction'] = v
 
-# Child class defining a sting/band(1D) object or a square(2D) object
-class Band(Members): pass
-class Square(Members): pass
+class Band(Members): 
+	"""A One-Dimentional; Line object and its properties
+	"""	
+	pass
+class Square(Members): 
+	"""A Two-Dimentional; Square object and its properties
+	"""	
+	pass
 
 class Cube(Members):
-	"""Child class defining cube(3D) object and its methods/properties"""
+	"""A Three-Dimentional; Cube object and its properties 
+	"""    	
 
 	def __init__(self, *arg):
+		"""Initialize Cube object by providing its members as in arguments. which will be numpy array of arrays
+		"""    		
 		super().__init__(*arg)
 		self.set_initial_views()
 
 	def set_initial_views(self):
-		"""property setting: views of a cube - initial setting"""
+		"""set all six faces of cube. faces are (front, back, left, right, top, bottom)
+		"""    		
 		self.views = {
 			front: 	self[0],
 			back: 	np.flip(np.flip(self[2]), 1),
@@ -66,13 +88,17 @@ class Cube(Members):
 			right: 	self[...,2].T,
 			top: 	self[[0,1,2], 2],
 			bottom: np.flip(np.flip(self[[0,1,2], 0]), 1),
-			}
+		}
 
 	def show(self, view):
-		"""Return a particular view in list
-		valid views are from view_dir keys
-		--> numpy.ndarray
-		"""
+		"""return the face of cube. view=face=side  faces are (front, back, left, right, top, bottom)
+
+		Args:
+			view (str): face of a cube
+
+		Returns:
+			list: Two dimentional Square Object detail
+		"""    		
 		op_dic = []
 		xis = view_dir[view]
 		for band in self.views[view]:
@@ -83,35 +109,43 @@ class Cube(Members):
 		return op_dic
 
 	def update_view(self, view, updated_sqr):
-		"""set a particular view from given updated_sqr (numpy 2D array)
-		valid views are from view_dir keys
-		"""
+		"""update face of cube with given updated Square
+
+		Args:
+			view (str): face of a cube
+			updated_sqr (Square): Square object, numpy array of array
+		"""    		
 		for i, band in enumerate(self.views[view]):
 			for j, piece in enumerate(band):
+				
 				self.views[view][i, j] = updated_sqr.members.flat[i*3+j]
 
 
 	def is_solved(self):
-		"""verfication: if cube is solved or not
-		--> boolean
-		"""
+		"""check is cube in solved position
+
+		Returns:
+			bool: True if solved, else False
+		"""    		
 		for view, xis in view_dir.items():
 			for band in self.views[view]:
-				if not self.all_points_same(band, xis): return False
+				if not self._all_points_same(band, xis): return False
 		return True
 
 	@staticmethod
-	def all_points_same(band, xis, prefix_match_char=0):
-		"""verification: if all colors towards given axis of a band/square are same or not
-		prefix_match_char: numeric value to match only given prefix characters of colors intead of full string.
-		--> boolean
-		"""
+	def _all_points_same(band, xis):
+		"""to check the provided axis color remain unchanged or not.
+
+		Args:
+			band (Square): Square 2D object
+			xis (str): axis (x,y,z)
+
+		Returns:
+			bool: True if all colors are same as previous, else False
+		"""    		
 		xiscolor = ''
 		for piece in band:
-			if prefix_match_char:
-				piece_color = piece.members[xis]['xiscolor'][:prefix_match_char]
-			else:
-				piece_color = piece.members[xis]['xiscolor']
+			piece_color = piece.members[xis]['xiscolor']#[:3]		# enable [:3] to match only first 3 characters of color
 			if xiscolor == '':
 				xiscolor = piece_color
 				continue
@@ -121,49 +155,80 @@ class Cube(Members):
 
 	# Rotation of Cube --------------------------------
 
-	def _change_to_bottom(cube):
+	def change_to_bottom(cube):
+		"""Turn the whole cube, i.e. Turn cube such face it faces now towards bottom Square.
+
+		Returns:
+			Cube: updated cube after move
+		"""    		
 		l = [cube[[2,1,0], i] for i in range(3)]
 		return _rotate_cube(l, swap_axis=('y', 'z'), inverse_axis='z')
 
-	def _change_to_top(cube):
+	def change_to_top(cube):
+		"""Turn the whole cube, i.e. Turn cube such face it faces now towards top Square.
+
+		Returns:
+			Cube: updated cube after move
+		"""    		
 		l = [cube[[0,1,2], i] for i in reversed(range(3))]
 		return _rotate_cube(l, swap_axis=('y', 'z'), inverse_axis='y')
 
-	def _change_to_left(cube):
+	def change_to_left(cube):
+		"""Turn the whole cube, i.e. Turn cube such face it faces now towards left Square.
+
+		Returns:
+			Cube: updated cube after move
+		"""    		
 		l = np.array([cube[...,j][[2,1,0], i] for j in range(3) for i in range(3)])
 		l.resize(3,3,3)
 		return _rotate_cube(l, swap_axis=('x', 'z'), inverse_axis='z')
 
-	def _change_to_right(cube):
+	def change_to_right(cube):
+		"""Turn the whole cube, i.e. Turn cube such face it faces now towards right Square.
+
+		Returns:
+			Cube: updated cube after move
+		"""    		
 		l = np.array([cube[...,j][[0,1,2], i] for j in reversed(range(3)) for i in range(3)])
 		l.resize(3,3,3)
 		return _rotate_cube(l, swap_axis=('x', 'z'), inverse_axis='x')
 
-	def _change_to_back(cube):
-		_cube = cube._change_to_top()
-		return _cube._change_to_top()
+	def change_to_back(cube):
+		"""Turn the whole cube, i.e. Turn cube such face it faces now towards back Square.
+
+		Returns:
+			Cube: updated cube after move
+		"""    		
+		_cube = cube.change_to_top()
+		return _cube.change_to_top()
 
 	def change_to(cube, view):
-		"""Move the eye: Change the front view to another face of cube
-		valid views are from view_dir keys
-		"""
+		"""Turn the whole cube, i.e. Turn cube such face it faces now towards give view side.
+
+		Args:
+			view (str): face name to turn towards
+
+		Returns:
+			Cube: updated cube after move
+		"""    		
 		maps = {
-			left: cube._change_to_left(),
-			right: cube._change_to_right(),
-			top: cube._change_to_top(),
-			bottom: cube._change_to_bottom(),
-			back: cube._change_to_back(),
+			left: cube.change_to_left(),
+			right: cube.change_to_right(),
+			top: cube.change_to_top(),
+			bottom: cube.change_to_bottom(),
+			back: cube.change_to_back(),
 		}
 		return maps[view]
 
 	# Rotation of a Square --------------------------------
 
 	def rotate_square(cube, view, clockwise=True):
-		"""Action: rotate a plane/Square (9-pieces) of a given view in either direction,
-		 w.r.t front view of the plane.
-		valid views are from view_dir keys
-		clockwise (boolean) - True = Clockwise / False = Anti-clock wise rotation of plane
-		"""
+		"""rotate a side/view of cube in given direction perspective to that face.
+
+		Args:
+			view (str): face name to be rotated
+			clockwise (bool, optional): True will rotate clockwise False will rotate anti-clockwise. Defaults to True.
+		"""    		
 		sqr = cube.views[view]
 		sqr = [ sqr[[0,1,2], i]  for i in reversed(range(3)) ] if clockwise else [ sqr[[2,1,0], i]  for i in range(3) ] 
 		swap_axis = _get_swap_axis(view, clockwise)
@@ -171,16 +236,21 @@ class Cube(Members):
 		updated_sqr = _rotate_square(sqr, swap_axis=swap_axis, inverse_axis=inverse_axis)
 		cube.update_view(view, updated_sqr)
 
-# --------------------------------------------------------------------------------------------
+
 
 ### Functions for Square ###
 
 def _get_swap_axis(view, clockwise):
-	"""returns a tuple of axis which are to be swapped based on view and rotation
-	valid views are from view_dir keys
-	clockwise (boolean) - True = Clockwise / False = Anti-clock wise rotation of plane
-	--> tuple
-	"""
+	"""during rotation of a square, axis directions will get changed for some points. this function takes care
+	of it.
+
+	Args:
+		view (str): face name getting rotated
+		clockwise (bool): direction of rotation True=Clockwise, False=anti-clockwise
+
+	Returns:
+		tuple: detail in tuple for axis to be swapped.
+	"""	
 	swap_axis = {
 		front: ('x', 'y'), back: ('y', 'x'),
 		left: ('y', 'z'), right: ('z', 'y'),
@@ -189,47 +259,62 @@ def _get_swap_axis(view, clockwise):
 	return swap_axis[view] if clockwise else tuple(reversed(swap_axis[view]))
 
 def _get_inverse_axis(swap_axis, clockwise):
-	"""returns an axis which require to be inversed ( +1/-1 ) based on the swapping axis and rotation
-	swap_axis : tuple of axis which are to be swapped.
-	clockwise (boolean) - True = Clockwise / False = Anti-clock wise rotation of plane
-	--> str
-	"""
+	"""returns the axis which is needed to be inversed based on rotation direction.
+
+	Args:
+		swap_axis (tuple): axis details to be swapped during rotations
+		clockwise (bool): direction of rotation True=Clockwise, False=anti-clockwisere
+
+	Returns:
+		str: axis to be inversed
+	"""    	
 	return swap_axis[0] if clockwise else swap_axis[1]
 
 def _rotate_square(bands, *args, **kwargs):
-	"""Rotate the Square/Band
-	args/kwargs: should include, swap_axis and inverse_axis details.
-	"""
+	"""rotate given square/band with provided swap axis and inverse_axis details in kwargs.
+	kwargs defines = swap_axis, inverse_axis
+
+	Args:
+		bands (Square): Square 2D object (containing bands) to be rotated.
+
+	Returns:
+		Square: Square 2D object after rotation.
+	"""    	
 	s = Square(*bands)
 	return _change_position(s, *args, **kwargs)
 
-# --------------------------------------------------------------------------------------------
 
 ### Functions for Cube ###
 
 def _rotate_cube(squares, *args, **kwargs):
-	"""Rotate the Cube
-	args/kwargs: should include, swap_axis and inverse_axis details.
-	"""
+	"""rotate given cube with provided swap axis and inverse_axis details in kwargs. 
+
+	Args:
+		squares (Cube): Cube 3D object (containing Squares) to be rotated
+
+	Returns:
+		Cube: Cube 3D object
+	"""    	
 	c = Cube(*squares)
 	return _change_position(c, *args, **kwargs)
 
 
-# --------------------------------------------------------------------------------------------
-
-### Functions:  Common ###
+### Functions Common ###
 
 def _change_position(instance, swap_axis, inverse_axis):
-	"""changes position of points on an instance ( Either Band or Cube )
-	swap_axis: tuple of axis to be swapped
-	inverse_axis: axis to be inversed direction	
-	--> updated instance
-	"""
+	"""rotate an instance/object (either Square, Cube)
+
+	Args:
+		instance (Square, Cube): Either Square-2D , Cube-3D object
+		swap_axis ([type]): axis to be swapped
+		inverse_axis ([type]): axis to be inversed
+
+	Returns:
+		Square, Cube: Either Square-2D , Cube-3D object
+	"""    	
 	a, b = swap_axis[0], swap_axis[1]
 	for point in instance.members.flat:
 		point.members[inverse_axis]['direction'] *= -1
 		point.members[a], point.members[b] = point.members[b], point.members[a]
 	return instance
-
-# --------------------------------------------------------------------------------------------
 

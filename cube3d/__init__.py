@@ -1,9 +1,10 @@
 __doc__ = "3-Dimention rubic Cube"
 
 """
-Three-Dimention Rubic cube activities.
+Virtual Three-Dimention Rubic cube.
 
-Excel input can be in below format
+Cube is expected to be visualized as below
+
 						Back = TOP + TOP					
 											
 						O222	O221	O220			
